@@ -343,7 +343,10 @@ bool Pn7161Reader::isTagStillPresent() {
     if (m_currentProtocol == nci::PROT_ISODEP) {
         TickType_t now = xTaskGetTickCount();
         if ((now - m_lastPresenceCheck) * portTICK_PERIOD_MS >= kPresenceCheckIntervalMs) {
-            (void)m_nci->rf_iso_dep_presence_check();
+            if (m_nci->rf_iso_dep_presence_check() != ESP_OK) {
+                m_connected=false;
+                return false; // Never retain a cached presence after a transport failure.
+            }
             m_lastPresenceCheck = now;
         }
         return m_nci->tag_in_field();
@@ -352,7 +355,7 @@ bool Pn7161Reader::isTagStillPresent() {
 }
 
 void Pn7161Reader::releaseTag() {
-    if (!m_nci) return;
+    if (!m_nci || !m_connected) return;
 
     esp_err_t ret = m_nci->rf_deactivate(nci::DEACTIVATION_TYPE_DISCOVERY);
     if (ret != nci::STATUS_OK) {
