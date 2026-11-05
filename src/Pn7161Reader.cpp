@@ -205,7 +205,8 @@ bool Pn7161Reader::pollForTag(std::vector<uint8_t>& uid,
                               std::array<uint8_t, 2>& atqa,
                               uint8_t& sak,
                               uint32_t timeoutMs) {
-    if (!m_nci) return false;
+    uid.clear();atqa.fill(0);sak=0;
+    if (!m_nci || !m_nci->is_initialized()) { m_connected=false;return false; }
     NciEvent event;
     esp_err_t ret = m_nci->get_event(event, timeoutMs);
     if (ret == ESP_ERR_TIMEOUT) {
@@ -213,6 +214,7 @@ bool Pn7161Reader::pollForTag(std::vector<uint8_t>& uid,
     }
     if (ret != ESP_OK) {
         ESP_LOGW(TAG, "get_event failed: 0x%X", ret);
+        m_connected=false;
         return false;
     }
     switch (event.type) {
