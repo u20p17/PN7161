@@ -244,15 +244,6 @@ bool Pn7161Reader::pollForTag(std::vector<uint8_t>& uid,
                 ESP_LOG_BUFFER_HEXDUMP(TAG, p, plen, ESP_LOG_WARN);
                 return false;
             }
-            if(p[1] != nci::INTF_ISODEP){
-                if((xTaskGetTickCount() - m_lastActivation) < pdMS_TO_TICKS(kActivationCooldownWindowMs)){
-                    ESP_LOGD(TAG, "Tag activated within cooldown window, ignoring!");
-                    m_lastActivation = xTaskGetTickCount();
-                    releaseTag();
-                    return false;
-                }
-                m_lastActivation = xTaskGetTickCount();
-            }
 
             uint8_t tlen = p[6];
             if (plen < 7 + tlen) {
