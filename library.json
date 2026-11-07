@@ -3,7 +3,8 @@
     "version": "1.1.1",
     "license": "MIT",
     "frameworks": [
-        "arduino"
+        "arduino",
+        "espidf"
     ],
     "platforms": [
         "espressif32"
@@ -11,5 +12,6 @@
     "build": {
         "includeDir": "include",
         "srcDir": "src"
-    }
+    },
+    "description": "Native ESP-IDF PN7160/PN7161 NCI driver with SPI and I2C transports"
 }
